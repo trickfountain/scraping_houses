@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1>Hi ! Welcome to house hunter !</h1>
+    <h2>What are we looking for today ?</h2>
+
+    <form method="post">
+        {{ form.hidden_tag() }}
+        {{ form.min_units.label }} {{ form.min_units }} 
+        <br>
+        {{ form.max_units.label }} {{ form.max_units }} 
+        <br>
+        {{ form.min_price.label }} {{ form.min_price }} 
+        <br>
+        {{ form.max_price.label }} {{ form.max_price }} 
+        <br>
+        <br>
+        {{ form.submit }}
+    </form>
+
+
+</div>
+
+{% endblock content %}
