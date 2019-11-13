@@ -1,0 +1,19 @@
+<div class="jumbotron">
+    <!-- Add if/else if no data is returned. -->
+    <h1>Here's what we got for you</h1>
+    <h2>Reminder, these are the criterias you picked</h2>
+
+    <ul>
+        {% for key, val in session.get('filters')  %}
+        <li><strong>{{ key }} </strong> : {{ val }}</li>
+        {% endfor %}
+    </ul>
+
+    <br><br>
+    <a href="{{ url_for('index') }}">New search</a>
+
+    <h2>Results</h2>
+
+    {{ table }}
+
+</div>
