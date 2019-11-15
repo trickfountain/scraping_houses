@@ -26,6 +26,7 @@ scraping_houses/.gitignore
 local_settings
 # Don't include the data files for now
 data/
+static/
 
 # Vs code files
 .vscode/

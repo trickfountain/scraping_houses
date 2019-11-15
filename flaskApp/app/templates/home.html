@@ -8,13 +8,15 @@
 
     <form method="post">
         {{ form.hidden_tag() }}
-        {{ form.min_units.label }} {{ form.min_units }} 
-        <br>
-        {{ form.max_units.label }} {{ form.max_units }} 
-        <br>
-        {{ form.min_price.label }} {{ form.min_price }} 
+        {{ form.min_price.label }} {{ form.min_price }}
+        {% for error in form.min_price.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
         <br>
         {{ form.max_price.label }} {{ form.max_price }} 
+        {% for error in form.max_price.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
         <br>
         <br>
         {{ form.submit }}

@@ -1,3 +1,6 @@
+# Rudimentary loader to go from json into db.
+# Should look at CLI options (sqlite3 is installer on your laptop) for bigger files
+
 from db_setup import Listing, db
 import json
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for centris project
+# Scrapy settings for Scraper project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,10 +9,10 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'centris'
+BOT_NAME = 'Scraper'
 
-SPIDER_MODULES = ['centris.spiders']
-NEWSPIDER_MODULE = 'centris.spiders'
+SPIDER_MODULES = ['Scraper.spiders']
+NEWSPIDER_MODULE = 'Scraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -46,7 +46,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'centris.middlewares.CentrisSpiderMiddleware': 543,
+#    'Scraper.middlewares.ScraperSpiderMiddleware': 543,
 #}
 
 SPIDER_MIDDLEWARES = {
@@ -56,7 +56,7 @@ SPIDER_MIDDLEWARES = {
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'centris.middlewares.CentrisDownloaderMiddleware': 543,
+#    'Scraper.middlewares.ScraperDownloaderMiddleware': 543,
 #}
 
 DOWNLOADER_MIDDLEWARES = {
@@ -75,7 +75,7 @@ DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'centris.pipelines.CentrisPipeline': 300,
+#    'Scraper.pipelines.ScraperPipeline': 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -1,10 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <div class="jumbotron">
     <!-- Add if/else if no data is returned. -->
     <h1>Here's what we got for you</h1>
     <h2>Reminder, these are the criterias you picked</h2>
 
     <ul>
-        {% for key, val in session.get('filters')  %}
+        {% for key, val in session.get('filters').items()  %}
         <li><strong>{{ key }} </strong> : {{ val }}</li>
         {% endfor %}
     </ul>
@@ -17,3 +21,5 @@
     {{ table }}
 
 </div>
+
+{% endblock content %}

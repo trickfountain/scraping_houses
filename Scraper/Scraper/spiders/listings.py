@@ -6,7 +6,7 @@ import json
 
 
 class ListingsSpider(scrapy.Spider):
-    name = 'listings'
+    name = 'commercial'
     allowed_domains = ['www.centris.ca']
 
     position = {
@@ -59,7 +59,7 @@ end
                     },
                     {
                         "fieldId": "SalePrice",
-                        "value": 5000000
+                        "value": 50000000
                     }
                 ]
             },
