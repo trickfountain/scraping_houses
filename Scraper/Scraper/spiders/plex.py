@@ -18,7 +18,7 @@ def clean_money(s_money):
     return s
     
 class ListingsSpider(scrapy.Spider):
-    name = 'commercial'
+    name = 'plex'
     allowed_domains = ['www.centris.ca']
 
     position = {
@@ -186,7 +186,7 @@ end
                 if any( rev in feat for rev in ['revenue', 'Revenus']):
                     val = clean_money(val)
                     try:
-                        potential_revenue = int(val)
+                        potential_revenue = val
                     except:
                         feat, val = clean(feat), clean(val) 
                         features.update({feat: val})
@@ -211,6 +211,6 @@ end
             'postal_code': postal_code,
             'description': clean(description),
             'potential_revenue': potential_revenue,
-            'features': features,
+            'features': json.dumps(features),
             'scraped_at': scraped_at
         }
