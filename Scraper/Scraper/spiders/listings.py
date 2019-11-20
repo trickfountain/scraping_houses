@@ -3,8 +3,20 @@ import scrapy
 from scrapy.selector import Selector
 from scrapy_splash import SplashRequest
 import json
+import re
+from re import sub
+from decimal import Decimal
+from datetime import datetime
 
+def clean(s):
+    s = s.replace('\n', ' ')
+    s = " ".join(s.split())
+    return s
 
+def clean_money(s_money):
+    s = s_money.replace('$', '').replace(' ', '').replace(',', '')
+    return s
+    
 class ListingsSpider(scrapy.Spider):
     name = 'commercial'
     allowed_domains = ['www.centris.ca']
@@ -95,38 +107,35 @@ end
         listings = sel.xpath("//div[@class='row templateListItem']")
         
         for i, listing in enumerate(listings):
-            list_no= f"{self.position['startPosition'] + i}/{count}"
+            listing_number= f"{self.position['startPosition'] + i}/{count}"
             centris_id = listing.xpath('.//meta[@itemprop="sku"]/@content').get()
             category = listing.xpath(
                 ".//div[@class='description']/h2/span/text()").get()
-            sub = listing.xpath(
+            title = listing.xpath(
                 ".//div[@class='description']/p[@class='features border']/span/span/text()").get()
-            price = listing.xpath(
-                ".//div[@class='description']/p[@class='price']/span/text()").get()
             city = listing.xpath(
                 ".//div[@class='description']/p[@class='address']/span/text()").get()
-            url = listing.xpath(".//a[@class='btn a-more-detail']/@href").get()
-            abs_url = f"https://www.centris.ca{url}"
+            detail_url = listing.xpath(".//a[@class='btn a-more-detail']/@href").get()
+            centris_detail_url = f"https://www.centris.ca{detail_url}"
             lat = listing.xpath(
                 './/span[@class="ll-match-score noAnimation"]/@data-lat').get()
             lng = listing.xpath(
                 './/span[@class="ll-match-score noAnimation"]/@data-lng').get()
 
             yield SplashRequest(
-                url=abs_url,
+                url=centris_detail_url,
                 endpoint='execute',
                 callback=self.parse_summary,
                 args={
                     'lua_source': self.script
                 },
                 meta={
-                    'list_no': list_no,
+                    'listing_number': listing_number,
                     'centris_id': centris_id,
                     'cat': category,
-                    'sub': sub,
-                    'pri': price,
+                    'title': title,
                     'city': city,
-                    'url': abs_url,
+                    'centris_detail_url': centris_detail_url,
                     'lat': lat,
                     'lng': lng}
             )
@@ -149,39 +158,59 @@ end
     def parse_summary(self, response):
         # Fields from main page
         category = response.request.meta['cat']
-        sub = response.request.meta['sub']
-        price = response.request.meta['pri']
+        title = response.request.meta['title']
         city = response.request.meta['city']
-        url = response.request.meta['url']
+        centris_detail_url = response.request.meta['centris_detail_url']
         lat = response.request.meta['lat']
         lng = response.request.meta['lng']
         centris_id = response.request.meta['centris_id']
-        list_no = response.request.meta['list_no']
+        listing_number = response.request.meta['listing_number']
         
         # Fields from summary page
+        price = response.xpath("//span[@itemprop='price']/@content").get()
         address = response.xpath("//h2[@itemprop='address']/text()").get()
+        postal_code = re.search(r"[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d", address).group()
         description = response.xpath(
             "normalize-space(//div[@itemprop='description']/text())").get()
-        DetailedSheetURL = response.xpath("//span[@id='DetailedSheetURL']/text()").get()
+        broker_details_url = response.xpath("//span[@id='DetailedSheetURL']/text()").get()
         tables = response.xpath('//h3[text()="Caractéristiques"]/following-sibling::table')
         features = {}
+        
+        potential_revenue = None
+        
         for table in tables:
             col1 = table.xpath('.//tr/td/text()').getall()
             col2 = table.xpath('.//tr/td/span/text()').getall()
-
-            features.update(dict(list(zip(col1, col2))))
+            
+            for feat, val in (zip(col1, col2)):
+                if any( rev in feat for rev in ['revenue', 'Revenus']):
+                    val = clean_money(val)
+                    try:
+                        potential_revenue = int(val)
+                    except:
+                        feat, val = clean(feat), clean(val) 
+                        features.update({feat: val})
+                else:
+                    feat, val = clean(feat), clean(val) 
+                    features.update({feat: val})
+            
+        scraped_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
         yield {
-            'list_no': list_no,
+            'listing_number': listing_number,
             'centris_id': centris_id,
             'category': category,
-            'sub': sub,
+            'title': clean(title),
             'price': price,
             'city': city,
-            'url': url,
+            'centris_detail_url': centris_detail_url,
+            'broker_detail_url': broker_details_url,
             'lat': lat,
             'lng': lng,
-            'address': address,
-            'description': description,
-            'features': features
+            'address': clean(address),
+            'postal_code': postal_code,
+            'description': clean(description),
+            'potential_revenue': potential_revenue,
+            'features': features,
+            'scraped_at': scraped_at
         }
