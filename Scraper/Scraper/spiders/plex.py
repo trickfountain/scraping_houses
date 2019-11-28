@@ -8,18 +8,26 @@ from re import sub
 from decimal import Decimal
 from datetime import datetime
 
+
 def clean(s):
     s = s.replace('\n', ' ')
     s = " ".join(s.split())
     return s
 
+
 def clean_money(s_money):
     s = s_money.replace('$', '').replace(' ', '').replace(',', '')
     return s
-    
+
+
 class ListingsSpider(scrapy.Spider):
     name = 'plex'
     allowed_domains = ['www.centris.ca']
+
+    custom_settings = {'ITEM_PIPELINES': {
+        'Scraper.pipelines.PlexPipeline': 300,
+    }
+    }
 
     position = {
         "startPosition": 0
@@ -105,17 +113,19 @@ end
         html = resp_dict.get('d').get('Result').get('html')
         sel = Selector(text=html)
         listings = sel.xpath("//div[@class='row templateListItem']")
-        
+
         for i, listing in enumerate(listings):
-            listing_number= f"{self.position['startPosition'] + i}/{count}"
-            centris_id = listing.xpath('.//meta[@itemprop="sku"]/@content').get()
+            listing_number = f"{self.position['startPosition'] + i}/{count}"
+            centris_id = listing.xpath(
+                './/meta[@itemprop="sku"]/@content').get()
             category = listing.xpath(
                 ".//div[@class='description']/h2/span/text()").get()
             title = listing.xpath(
                 ".//div[@class='description']/p[@class='features border']/span/span/text()").get()
             city = listing.xpath(
                 ".//div[@class='description']/p[@class='address']/span/text()").get()
-            detail_url = listing.xpath(".//a[@class='btn a-more-detail']/@href").get()
+            detail_url = listing.xpath(
+                ".//a[@class='btn a-more-detail']/@href").get()
             centris_detail_url = f"https://www.centris.ca{detail_url}"
             lat = listing.xpath(
                 './/span[@class="ll-match-score noAnimation"]/@data-lat').get()
@@ -165,36 +175,55 @@ end
         lng = response.request.meta['lng']
         centris_id = response.request.meta['centris_id']
         listing_number = response.request.meta['listing_number']
-        
+
         # Fields from summary page
         price = response.xpath("//span[@itemprop='price']/@content").get()
         address = response.xpath("//h2[@itemprop='address']/text()").get()
-        postal_code = re.search(r"[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d", address).group()
+        postal_code = re.search(
+            r"[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d", address).group()
         description = response.xpath(
             "normalize-space(//div[@itemprop='description']/text())").get()
-        broker_details_url = response.xpath("//span[@id='DetailedSheetURL']/text()").get()
-        tables = response.xpath('//h3[text()="Caractéristiques"]/following-sibling::table')
+        broker_details_url = response.xpath(
+            "//span[@id='DetailedSheetURL']/text()").get()
+        tables = response.xpath(
+            '//h3[text()="Caractéristiques"]/following-sibling::table')
         features = {}
-        
+
         potential_revenue = None
-        
+
         for table in tables:
             col1 = table.xpath('.//tr/td/text()').getall()
             col2 = table.xpath('.//tr/td/span/text()').getall()
-            
+
             for feat, val in (zip(col1, col2)):
-                if any( rev in feat for rev in ['revenue', 'Revenus']):
+                if any(rev in feat for rev in ['revenue', 'Revenus']):
                     val = clean_money(val)
                     try:
                         potential_revenue = val
                     except:
-                        feat, val = clean(feat), clean(val) 
+                        feat, val = clean(feat), clean(val)
                         features.update({feat: val})
                 else:
-                    feat, val = clean(feat), clean(val) 
+                    feat, val = clean(feat), clean(val)
                     features.update({feat: val})
-            
+
         scraped_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        
+        residential_units = None
+        commercial_units = None
+        if features.get('Nombre d’unités'):
+            for s in features.get('Nombre d’unités').split(","):
+                # Matching for residentiel 
+                search = re.search(r'r?sid.*\s\(([0-9])\)', s, re.IGNORECASE)
+                if search:
+                    residential_units = search.group(1)
+                # Matching for commercial
+                search = re.search(r'mmer.*\(([0-9])\)', s, re.IGNORECASE)
+                if search:
+                    commercial_units = search.group(1)
+                    
+        unites_residentielles = features.get('Unités résidentielles')
+        unite_principale = features.get('Unité principale')
 
         yield {
             'listing_number': listing_number,
@@ -211,6 +240,10 @@ end
             'postal_code': postal_code,
             'description': clean(description),
             'potential_revenue': potential_revenue,
+            'residential_units': residential_units,
+            'commercial_units': commercial_units,
+            'unites_residentielles': unites_residentielles,
+            'unite_principale': unite_principale,
             'features': json.dumps(features),
             'scraped_at': scraped_at
         }

@@ -18,6 +18,11 @@
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
         <br>
+        {{ form.geofence.label }} {{ form.geofence }} 
+        {% for error in form.geofence.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        <br>
         <br>
         {{ form.submit }}
     </form>

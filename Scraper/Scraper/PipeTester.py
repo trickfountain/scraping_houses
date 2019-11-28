@@ -5,35 +5,27 @@ import config
 from app import app, db
 from app.models import Listing
 import json
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
+import numpy as np
 
-with open('/home/eric/scraping_houses/data/commercialNov19.json') as f:
+import re
+
+with open('/home/eric/scraping_houses/data/plex_sample.json') as f:
   items = json.load(f)
-  
-print(type(items))
 
-print(items)
+feats = json.loads(items[1]['features'])
 
+residential_units = None
+commercial_units = None
 
-listing = Listing(" ".join(item['centris_id'].split()),
-                  item['category'],
-                  item['price'],
-                  item['centris_detail_url'],
-                  item['city'],
-                  item['lat'],
-                  item['lng'])
-
-
-#db.session.add(listing)
-# db.session.commit()
-
-all = db.query.all()
-print(all[0])
-
-# Get the listing
-i = Listing.query.filter_by(centris_id='11269851').first()
-	
-from datetime import datetime
-# Update last_seen
-i.last_seen = datetime.utcnow().strftime("%d-%b-%Y (%H:%M:%S.%f)")
-
-# Then simply commit.
+if feats.get('Nombre d’unité'):
+  for s in feats['Nombre d’unités'].split(","):
+    # Matching for residentiel 
+    search = re.search('r?sid.*\s\(([0-9])\)', s, re.IGNORECASE)
+    if search:
+      residential_units = search.group(1)
+    # Matching for commercial
+    search = re.search('mmer.*\(([0-9])\)', s, re.IGNORECASE)
+    if search:
+      commercial_units = search.group(1)

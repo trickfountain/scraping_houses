@@ -26,3 +26,6 @@ class ResultsTable(Table):
     broker_detail_url = LinkCol('Broker details', 'redirect_page',
                                 url_kwargs=dict(link='broker_detail_url')
                                 )
+    geofence = Col('Region')
+    potential_revenue = Col('Potential Revenue')
+    pt_revenue = Col('% Revenue')
