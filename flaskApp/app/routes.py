@@ -117,3 +117,8 @@ def redirect_page():
         return redirect(link)
     else:
         return redirect(url_for('page_not_found', 404))
+
+
+@app.route('/dash')
+def dash_table():
+    return render_template('dash_table.html')

@@ -1,0 +1,33 @@
+
+
+.dropdown{
+    display: grid;
+    grid-template-columns: repeat(3, 30%);
+    grid-template-rows: 100px;
+    text-align: center;
+  }
+
+#header {
+    background-color: #111111;
+    text-align: center;
+    color: #7FDBFF;
+    font: bold;
+}
+
+#filters {
+    background-color: goldenrod;
+    color: black;
+    max-width: 90%;
+}
+
+#price-sel {
+    background-color: darkseagreen;
+}
+
+.sub-select2 {
+    columns: 2;
+}
+
+.filter-sub {
+    height: 15px;
+}

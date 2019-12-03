@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="jumbotron" id="title">
+    <!-- Add if/else if no data is returned. -->
+    <h1>Wow Bravo WoW : Belle table Dash Eric WOW</h1>
+</div>
+
+<div style="text-align:center">
+
+<iframe src="http://localhost:8080" width="90%" height=800></iframe>
+
+    <br><br>
+    <a href="{{ url_for('index') }}">New search</a>
+
+    <h2>Results</h2>
+
+    {{ table | safe }}
+
+</div>
+
+{% endblock content %}
