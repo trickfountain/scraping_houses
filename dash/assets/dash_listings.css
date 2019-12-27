@@ -1,33 +1,109 @@
+#page-box {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    min-width: 95vw;
+}
 
+#more-info-section {
+    background: #fea49f;
+    min-width: 10vw;
+    max-width: 20vw;
+    flex-basis: 0.5 1 15vw;
+}
 
-.dropdown{
-    display: grid;
-    grid-template-columns: repeat(3, 30%);
-    grid-template-rows: 100px;
+#filters-section {
+    background: #fbaf08;
+    padding-bottom: 15px;
+}
+
+#ui-section {
+    background: #00a0a0;
+    padding-bottom: 15px;
+}
+
+#filters-box {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+}
+
+.filter {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    margin: 0 2px;
+}
+
+.multi-select-container {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0px 2px;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.sub-multi {
+    display: flex;
+    flex-flow: column nowrap;
     text-align: center;
-  }
+}
 
-#header {
-    background-color: #111111;
+.result-block {
+    display: flex;
+    flex-flow: column nowrap;
+    overflow-y: scroll;
+    height: 100vh;
+    flex: 1 1 80vw;
+}
+
+#user-input {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    min-width: 100%;
+    margin-bottom: 10px;
+
+}
+
+.result-block > .section {
     text-align: center;
-    color: #7FDBFF;
-    font: bold;
+    font-size: large;
+    min-width: 100%;
 }
 
-#filters {
-    background-color: goldenrod;
-    color: black;
-    max-width: 90%;
+label {
+    text-align: center;
+    font-size: 16px;
+    margin: 5px 5px;
+    padding: 5px 5px;
+    max-width: 150px;
 }
 
-#price-sel {
-    background-color: darkseagreen;
+/* layout for the output of the more info section*/
+.info {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    /* background: yellowgreen; */
+    text-align: center;
+    margin: 2px 5px;
+    padding: 0px 2px;
+    border: 1px solid rgba(0,0,0,0.5);
+    align-items: center;
+    font-size: small;
 }
 
-.sub-select2 {
-    columns: 2;
+/* formats the input field for number, this overwrites dash's css*/
+input[type="number"], .Select.Select--single {
+    width: 150px;
+    text-align: center;
+    font-size: small;
 }
 
-.filter-sub {
-    height: 15px;
+/* Section header */
+h3 {
+    font-size: 18px;
+    text-align: center;
+    padding: 0 0;
 }

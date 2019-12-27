@@ -1,16 +1,18 @@
-import dash_table
-import json
 import sys
 sys.path.append('/home/eric/scraping_houses/flaskApp')
+sys.path.append('/home/eric/scraping_houses')
+
 import pandas as pd
+import dash_table
+import json
 from dash.dependencies import Input, Output
 from sqlalchemy import text
 from app import db
 from app.models import Listing, Fence
-import dash_html_components as html
-import dash_core_components as dcc
 import dash
-
+import dash_core_components as dcc
+import dash_html_components as html
+from helpers.taxes import TaxBrackets, tax_calculator
 
 # Getting data from SQLite
 sql = text(f'''SELECT id,
@@ -29,10 +31,21 @@ sql = text(f'''SELECT id,
                   ''')
 
 df = pd.read_sql(sql, db.engine)
-df = df.astype({'residential_units':float,
-           'commercial_units': float})
+df['pt_revenue'] = df.potential_revenue/df.price
+df = df.astype({'residential_units': float,
+                'commercial_units': float})
 
-nulls = df[df.residential_units.between(1,2)].residential_units
-t = [i for i in df.residential_units if type(i) == str]
+df['welcome_tax'] = tax_calculator(df,
+                        TaxBrackets.welcome_tax.get('Montreal'),
+                        ).loc[:,'total']
 
-print(nulls)
+
+df['school_tax'] = tax_calculator(df,
+                        TaxBrackets.school_tax.get('Montreal'),
+                        ).loc[:,'total']
+
+df['property_tax'] = tax_calculator(df,
+                        TaxBrackets.property_tax.get('Montreal'),
+                        ).loc[:,'total']
+
+print(df.head())
