@@ -14,19 +14,16 @@ def clean(s):
     s = " ".join(s.split())
     return s
 
-
 def clean_money(s_money):
     s = s_money.replace('$', '').replace(' ', '').replace(',', '')
     return s
-
 
 class ListingsSpider(scrapy.Spider):
     name = 'plex'
     allowed_domains = ['www.centris.ca']
 
-    custom_settings = {'ITEM_PIPELINES': {
-        'Scraper.pipelines.PlexPipeline': 300,
-    }
+    custom_settings = {
+        # 'ITEM_PIPELINES': {'Scraper.pipelines.PlexPipeline': 300,}
     }
 
     position = {
@@ -112,26 +109,42 @@ end
         count = resp_dict.get('d').get('Result').get('count')
         html = resp_dict.get('d').get('Result').get('html')
         sel = Selector(text=html)
-        listings = sel.xpath("//div[@class='row templateListItem']")
-
+        listings = sel.xpath("//div[@class='shell']")
+        
         for i, listing in enumerate(listings):
             listing_number = f"{self.position['startPosition'] + i}/{count}"
             centris_id = listing.xpath(
                 './/meta[@itemprop="sku"]/@content').get()
             category = listing.xpath(
-                ".//div[@class='description']/h2/span/text()").get()
+                ".//span[@itemprop='category']").get()
             title = listing.xpath(
                 ".//div[@class='description']/p[@class='features border']/span/span/text()").get()
             city = listing.xpath(
                 ".//div[@class='description']/p[@class='address']/span/text()").get()
             detail_url = listing.xpath(
-                ".//a[@class='btn a-more-detail']/@href").get()
+                ".//a[@class='a-more-detail']/@href").get()
             centris_detail_url = f"https://www.centris.ca{detail_url}"
             lat = listing.xpath(
                 './/span[@class="ll-match-score noAnimation"]/@data-lat').get()
             lng = listing.xpath(
                 './/span[@class="ll-match-score noAnimation"]/@data-lng').get()
 
+            #print(f'Expecting SplashRequest for:\n   --> {centris_detail_url}')
+            
+            meta =  {
+                'listing_number': listing_number,
+                'centris_id': centris_id,
+                'cat': category,
+                'title': title,
+                'city': city,
+                'centris_detail_url': centris_detail_url,
+                'lat': lat,
+                'lng': lng
+                }
+            
+            #yield meta
+            
+            
             yield SplashRequest(
                 url=centris_detail_url,
                 endpoint='execute',
@@ -139,15 +152,7 @@ end
                 args={
                     'lua_source': self.script
                 },
-                meta={
-                    'listing_number': listing_number,
-                    'centris_id': centris_id,
-                    'cat': category,
-                    'title': title,
-                    'city': city,
-                    'centris_detail_url': centris_detail_url,
-                    'lat': lat,
-                    'lng': lng}
+                meta=meta
             )
 
         increment_number = resp_dict.get('d').get(
@@ -155,6 +160,7 @@ end
 
         if self.position['startPosition'] <= count:
             self.position['startPosition'] += increment_number
+
             yield scrapy.Request(
                 url="https://www.centris.ca/Mvc/Property/GetInscriptions",
                 method="POST",
@@ -166,6 +172,7 @@ end
             )
 
     def parse_summary(self, response):
+        print('**SPLASH** : Parsing Summary page from Splash Request')
         # Fields from main page
         category = response.request.meta['cat']
         title = response.request.meta['title']

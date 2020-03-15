@@ -59,8 +59,8 @@ class PlexPipeline(object):
         db.session.commit()
 
     def close_spider(self, spider):
-            db.session.commit()
-            logging.warning('Spider closed by Pipeline')
+        db.session.commit()
+        logging.warning('Spider closed by Pipeline')
 
 
 # class LotsPipeline(object):
