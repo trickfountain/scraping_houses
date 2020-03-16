@@ -1,8 +1,28 @@
-# House Hunt project - Progress 
-- [ ] Git rebase ?
-- Done for now. It doesn't look great but that's not really what you want to do in life.
+# Fix GIT - Don't let it slide
+- you changed a bunch of things in EC2 branch but really you should be working back in Master or a in a new branch for scrapper.
+- Merge EC2 and Master
+- Create new branch for the scrapping stuff.
 
-Next step: Scrape scrape scrape !
+
+## Troubleshooting Scrapper
+- Everything seems to be working fine but you have to review all the xpaths, they did a pretty swank refactoring.
+
+- I think I might like to decouple the ingestion and scrapping. Spit some JSONs or .csvs so we have a raw log.
+    - We'll have an ingestion script running right after.
+    - Much easier to track and handle and good practice for work....
+
+- One scrapper to rule them all if possible (condos, houses etc.)
+    - Get the data raw, structure on ingest.
+
+- Specify what you want to do...
+- I think if you can get a `skip` if already scrapped it would make for a decently light scrapper.
+    - Even if covering all `geos`.
+- Bare minimum on the xpaths.
+    - Get most things from Summary
+    - Assume that you are scrapping the whole site.
+        - Any filtering/triggers should be done after.
+            - 70k listing is not that much....
+        - Get centris_id to skip if already in DB
 
 ## Backlog
 
@@ -49,6 +69,7 @@ Your UDEMY password is 34Pigeon$$ with email address eric.j.fontaine@gmail.com\
 terminal > ssplash
 `docker run -p 8050:8050 scrapinghub/splash`
 
+## Crawling locally
 
 # Testing xpath on JS pages
 > this works in `scrapy shell`
