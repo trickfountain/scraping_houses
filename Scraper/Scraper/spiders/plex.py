@@ -105,6 +105,8 @@ end
         )
 
     def parse(self, response):
+        return response
+        
         resp_dict = json.loads(response.body)
         count = resp_dict.get('d').get('Result').get('count')
         html = resp_dict.get('d').get('Result').get('html')
