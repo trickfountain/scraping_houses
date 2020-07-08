@@ -26,7 +26,6 @@ class ListingsSpider(scrapy.Spider):
     }
     # Set to False for full scrape
     MAX_LISTINGS = False
-
     script = '''
         function main(splash, args)
         splash:on_request(function(request)
@@ -112,8 +111,8 @@ end
             'Result').get('inscNumberPerPage')
         # incremet & pos just for debugging.
         meta = {
-            # 'incrementNumber': increment_number,
-            # 'startPosition': self.position['startPosition']
+            'incrementNumber': increment_number,
+            'startPosition': self.position['startPosition']
             }
         
         for listing in listings:
@@ -139,7 +138,7 @@ end
             self.position['startPosition'] += increment_number
 
             yield scrapy.Request(
-                url="https://www.centris.ca/Mvc/Property/GetInscriptions",
+                url="https://www.centris.ca/Property/GetInscriptions",
                 method="POST",
                 body=json.dumps(self.position),
                 headers={
@@ -151,15 +150,14 @@ end
     def parse_detailed(self, response):
         "Parse individual listing (result of splash request)"
         
-        # meta has a lot of unwanted fields, specify what we want to keep
         meta_fields = ['centris_id', 'category', 'centris_detail_url', 'lat', 'lng',
-                       #'startPosition', 'incrementNumber'
+                       'startPosition', 'incrementNumber'
                        ]
         fields = {}
         for k in meta_fields:
             fields[k] = response.request.meta[k]
 
-        # Get fields of interest in detailed page with xpath
+        # fields from detailed page
         fields['price'] = response.xpath("//span[@itemprop='price']/@content").get()
         fields['address'] = response.xpath("//h2[@itemprop='address']/text()").get()
         fields['description'] = response.xpath("normalize-space(//div[@itemprop='description']/text())").get()

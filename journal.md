@@ -1,28 +1,19 @@
-# Fix GIT - Don't let it slide
-- you changed a bunch of things in EC2 branch but really you should be working back in Master or a in a new branch for scrapper.
-- Merge EC2 and Master
-- Create new branch for the scrapping stuff.
+# Next up
+- working on branch `crawler_refactor`
+- Next steps are in : `/home/eric/scraping_houses/Scraper/Sandbox/parser_refactor.ipynb`
+    - The POST request is sending you the website in french but you want the english version.
+    - Will be more easy to standardize and also centri is in BC
+- Then confirm if it's roughly working for each type
+    - Plex
+    - House
+    - Condo --> Make sure you get the fees if they are there
+    - Lot --> Probably the most different one
+    - Cottage --> Check a couple to see, should be close to home.
+    - Commercial --> ok if not covered.
 
+# After that: pleasure in the cloud.
+- EC2 + Lambda to scrape once a week.
 
-## Troubleshooting Scrapper
-- Everything seems to be working fine but you have to review all the xpaths, they did a pretty swank refactoring.
-
-- I think I might like to decouple the ingestion and scrapping. Spit some JSONs or .csvs so we have a raw log.
-    - We'll have an ingestion script running right after.
-    - Much easier to track and handle and good practice for work....
-
-- One scrapper to rule them all if possible (condos, houses etc.)
-    - Get the data raw, structure on ingest.
-
-- Specify what you want to do...
-- I think if you can get a `skip` if already scrapped it would make for a decently light scrapper.
-    - Even if covering all `geos`.
-- Bare minimum on the xpaths.
-    - Get most things from Summary
-    - Assume that you are scrapping the whole site.
-        - Any filtering/triggers should be done after.
-            - 70k listing is not that much....
-        - Get centris_id to skip if already in DB
 
 ## Backlog
 
